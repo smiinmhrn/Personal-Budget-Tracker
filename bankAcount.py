@@ -18,10 +18,10 @@ def main_menu():
     #match the options with user choice
     while True:
         if choice == FirstMenu.SIGN_UP.value[1]:
-            sign_Up()
+            sign_up()
             break
         elif choice == FirstMenu.SIGN_IN.value[1]:
-
+            sign_in()
             break
         elif choice == FirstMenu.EXIST.value[1]:
             break
@@ -43,13 +43,15 @@ def valid_command():
     return valid_input
 
 
-def sign_Up():
+#creat an account for user
+def sign_up():
     os.system('cls')
     name = input('Enter your full name \n').strip()
     username = input('Enter user name to creat an account \n').strip()
 
     while True:
-        if not uniq_username(username):
+        if not uniq_username(username)[0]:
+            print('user name already taken choose another one')
             username = input().strip()
         else:
             break
@@ -64,6 +66,29 @@ def sign_Up():
     }
     append_to_file(user_info)
 
+
+#user sign in to the account
+def sign_in():
+    os.system('cls')
+    username = input('Enter your username \n')
+
+    username_info = ()
+    while True:
+        username_info = uniq_username(username)
+        if username_info[0]:
+            username = input("username not found. try another \n")
+        else:
+            break
+    
+    password = input('Enter your password \n')
+    while True:
+        if username_info[1] == password:
+            print('your pass is correct')
+            break
+        else:
+            password = input('your pass is wrong. try another \n')
+
+
 #check if the user name is uniq or not
 def uniq_username(username):
     try:
@@ -71,17 +96,15 @@ def uniq_username(username):
             data = json.load(file)
     except FileNotFoundError:
         data = []
-        return True
-
+        return (True, "")
     for user_data in data:
         if user_data["username"] == username:
-            print('user name already taken choose another one')
-            return False
+            return (False, user_data["password"])
         else:
-            return True
+            return (True, "")
 
 
-
+#insure that all the pass format is correct
 def valid_password(password):
     while True:
         if not valid_password_lenth(password):
@@ -102,6 +125,7 @@ def valid_password(password):
         else:
             return password
 
+
 #check the password format
 def valid_password_lenth(password):
 
@@ -110,7 +134,6 @@ def valid_password_lenth(password):
         return False
     else:
         return True
-
 
 def valid_password_upercase(password):
    
