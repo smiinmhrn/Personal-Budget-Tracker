@@ -67,6 +67,8 @@ def user_menu():
 
 #do and write the transactions into file
 def Transaction_registration():
+    global global_user_info
+
     os.system('cls')
     print("[ TRANSACTION REGISTRATION ]")
     transaction_type = valid_number_input(input("What kind of transaction is it ؟\n1. Income          2. Cost \n"))
@@ -183,25 +185,26 @@ def sign_up():
 
     password = valid_password(input('Enter your password \n').strip())
 
-    user_info = {
+    global_user_info = {
         "name": name,
         "username": username,
         "password": password,
         "cash": 0,
         "transactions" : []
     }
-    append_to_file(user_info)
+    append_to_file(global_user_info)
     
     os.system('cls')
     user_menu()
 
 #user sign in to the account
 def sign_in():
+    global global_user_info
+
     os.system('cls')
     print("[ SIGN IN ]")
     username = input('Enter your username \n').strip()
 
-    username_info = ()
     while True: 
         if uniq_username(username):
             username = input("username not found. try again \n").strip()
@@ -320,6 +323,8 @@ def append_to_file(new_data):
 
 #delete a specific object from json and file and write the file 
 def delete_from_json():
+    global global_user_info
+
     # Load JSON data from file
     with open('account.json', 'r') as file:
         data = json.load(file)
