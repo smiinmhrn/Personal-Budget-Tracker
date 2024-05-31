@@ -15,6 +15,8 @@ class UserMenu(Enum):
     STATISTICS_AND_REPORTING = ("4. Statistics and reporting", 4)
     BACK = ("5. Back", 5)
 
+global_user_info = {}
+
 def main_menu():
     #print the menu
     print(FirstMenu.SIGN_UP.value[0], FirstMenu.SIGN_IN.value[0], FirstMenu.EXIST.value[0], 'choose your command...', sep='\n')
@@ -79,11 +81,12 @@ def valid_command():
 #creat an account for user
 def sign_up():
     os.system('cls')
+    print("[ SIGN UP ]")
     name = input('Enter your full name \n').strip()
     username = input('Enter user name to creat an account \n').strip()
 
     while True:
-        if not uniq_username(username)[0]:
+        if not uniq_username(username):
             print('user name already taken choose another one')
             username = input().strip()
         else:
@@ -105,19 +108,19 @@ def sign_up():
 #user sign in to the account
 def sign_in():
     os.system('cls')
+    print("[ SIGN IN ]")
     username = input('Enter your username \n').strip()
 
     username_info = ()
-    while True:
-        username_info = uniq_username(username)
-        if username_info[0]:
+    while True: 
+        if uniq_username(username):
             username = input("username not found. try again \n").strip()
         else:
             break
     
     password = input('Enter your password \n').strip()
     while True:
-        if username_info[1] == password:
+        if global_user_info["password"] == password:
             os.system('cls')
             user_menu()
             break
@@ -127,17 +130,20 @@ def sign_in():
 
 #check if the user name is uniq or not
 def uniq_username(username):
+    global global_user_info
+
     try:
         with open("account.json", "r") as file:
             data = json.load(file)
     except FileNotFoundError:
         data = []
-        return (True, "")
+        return True
     for user_data in data:
         if user_data["username"] == username:
-            return (False, user_data["password"])
+            global_user_info = user_data
+            return False
         else:
-            return (True, "")
+            return True
 
 
 #insure that all the pass format is correct
