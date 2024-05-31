@@ -86,9 +86,12 @@ def Transaction_registration():
     date = str(get_user_date())
     category = valid_string_input(input("enter the category of transport: "))
 
+    #create an id for every transaction to undrestand which transaction did earlier
+    transaction_id = len(global_user_info["transactions"]) + 1
 
     #make a dictionary of it to save
     transactions = {
+        "id": transaction_id,
         "reciver": receiver,
         "depositor": depositor,
         "amount": amount,
@@ -171,6 +174,8 @@ def valid_number_input(user_input):
 
 #creat an account for user
 def sign_up():
+    global global_user_info
+
     os.system('cls')
     print("[ SIGN UP ]")
     name = input('Enter your full name \n').strip()
