@@ -2,6 +2,7 @@ from enum import Enum
 import os
 import json
 import re
+from datetime import datetime
 
 class FirstMenu(Enum):
     SIGN_UP = ("1. Sign Up", 1)
@@ -19,10 +20,10 @@ global_user_info = {}
 
 def main_menu():
     #print the menu
-    print(FirstMenu.SIGN_UP.value[0], FirstMenu.SIGN_IN.value[0], FirstMenu.EXIST.value[0], 'choose your command...', sep='\n')
+    print(FirstMenu.SIGN_UP.value[0], FirstMenu.SIGN_IN.value[0], FirstMenu.EXIST.value[0], sep='\n')
 
     #give the command
-    choice = valid_command()
+    choice = valid_number_input(input("choose your command... \n"))
 
     #match the options with user choice
     while True:
@@ -35,20 +36,20 @@ def main_menu():
         elif choice == FirstMenu.EXIST.value[1]:
             break
         else:
-            print('Invalid command. choose another one')
-            choice = valid_command()
+            choice = valid_number_input(input("Invalid command. choose another one \n"))
 
 def user_menu():
     #print the menu
     print(UserMenu.TRANSACTION_REGISTRATION.value[0], UserMenu.MANAGE_CATEGORIES.value[0],
-           UserMenu.BILL.value[0], UserMenu.STATISTICS_AND_REPORTING.value[0], UserMenu.BACK.value[0], 'choose your command...', sep='\n')
+           UserMenu.BILL.value[0], UserMenu.STATISTICS_AND_REPORTING.value[0], UserMenu.BACK.value[0], sep='\n')
     
     #give the command
-    choice = valid_command()
+    choice = valid_number_input(input("choose your command...\n"))
 
     #match the options with user choice
     while True:
             if choice == UserMenu.TRANSACTION_REGISTRATION.value[1]:
+                Transaction_registration()
                 break
             elif choice == UserMenu.MANAGE_CATEGORIES.value[1]:
                 break
@@ -61,20 +62,108 @@ def user_menu():
                 main_menu()
                 break
             else:
-                print('Invalid command. try again')
-                choice = valid_command()
+                choice = valid_number_input('Invalid command. try again \n')
 
 
-#give the valid command from user
-def valid_command():
+#do and write the transactions into file
+def Transaction_registration():
+    os.system('cls')
+    print("[ TRANSACTION REGISTRATION ]")
+    transaction_type = valid_number_input(input("What kind of transaction is it ؟\n1. Income          2. Cost \n"))
+    
+    while True:
+        if transaction_type != 1 and transaction_type != 2:
+            transaction_type = valid_number_input(input("choose from options above \n"))
+        else: 
+            break
+
+    #give the info of transaction from user 
+    receiver = valid_string_input(input("enter the name of receiver: "))
+    depositor = valid_string_input(input("enter the name of depositor: "))
+    amount = valid_number_input(input("enter the amount of money of transport: "))
+    date = str(get_user_date())
+    category = valid_string_input(input("enter the category of transport: "))
+
+
+    #make a dictionary of it to save
+    transactions = {
+        "reciver": receiver,
+        "depositor": depositor,
+        "amount": amount,
+        "date": date,
+        "category": category
+    }
+
+
+    #check if the transaction is income increase the user cash else decrease it and update the user cash
+    if transaction_type == 1 :
+        global_user_info["cash"] = global_user_info["cash"] + amount
+    else:
+        global_user_info["cash"] = global_user_info["cash"] - amount
+    
+
+    #update and add the new transaction into user account
+    global_user_info["transactions"].append(transactions)
+
+    #delete the old user info from json file
+    delete_from_json()
+
+    #update an add the user info into file
+    append_to_file(global_user_info)
+    
+    #access the user to add another transaction or back to previous menue
+    command = valid_number_input(input("Transaction saved sucsesfully.\n1. Add another          2. Back\n"))
+
+    while True:
+        if command != 1 and transaction_type != 2:
+            command = valid_number_input(input("choose from options above \n"))
+        else: 
+            break
+    
+    if command == 1:
+        Transaction_registration()
+    else:
+        os.system('cls')
+        user_menu()
+
+
+#check the date format for transactions
+def get_user_date(prompt="Enter a date of transport (YYYY-MM-DD): "):
+    while True:
+        user_input = input(prompt)
+        try:
+            # Try to parse the input into a datetime object
+            user_date = datetime.strptime(user_input, "%Y-%m-%d")
+            # Format the datetime object to return only the date as string (YYYY-MM-DD)
+            formatted_date = user_date.strftime("%Y-%m-%d")
+            return formatted_date
+        except ValueError:
+            print("Invalid date format. Please enter the date in YYYY-MM-DD format.")
+
+
+#give the valid string command from user
+def valid_string_input(user_input):
+    while True:
+        try:
+            int(user_input)
+            print("Please enter a name. try again")
+            user_input = input().strip()
+            break
+        except ValueError:
+            break
+    return user_input
+
+
+#give the valid number command from user
+def valid_number_input(user_input):
     valid_input = 0
     while True:
-        user_input = input().strip()
         try:
             valid_input = int(user_input)
             break
         except ValueError:
             print("Please enter a number. try again")
+            user_input = input().strip()
     return valid_input
 
 
@@ -229,5 +318,17 @@ def append_to_file(new_data):
         json.dump(data, file, indent= 5)
 
 
+#delete a specific object from json and file and write the file 
+def delete_from_json():
+    # Load JSON data from file
+    with open('account.json', 'r') as file:
+        data = json.load(file)
+
+    # Filter out the object with matching username
+    filtered_data = [user for user in data if user.get('username') != global_user_info["username"]]
+
+    # Save updated JSON data back to file
+    with open('account.json', 'w') as file:
+        json.dump(filtered_data, file, indent=5)
 
 main_menu()
