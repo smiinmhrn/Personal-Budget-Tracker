@@ -8,6 +8,13 @@ class FirstMenu(Enum):
     SIGN_IN = ("2. Sign in", 2)
     EXIST = ("3. Exist", 3)
 
+class UserMenu(Enum):
+    TRANSACTION_REGISTRATION = ("1. Transaction registration", 1)
+    MANAGE_CATEGORIES = ("2. Manage categories", 2)
+    BILL = ("3. Bill", 3)
+    STATISTICS_AND_REPORTING = ("4. Statistics and reporting", 4)
+    BACK = ("5. Back", 5)
+
 def main_menu():
     #print the menu
     print(FirstMenu.SIGN_UP.value[0], FirstMenu.SIGN_IN.value[0], FirstMenu.EXIST.value[0], 'choose your command...', sep='\n')
@@ -29,6 +36,32 @@ def main_menu():
             print('Invalid command. choose another one')
             choice = valid_command()
 
+def user_menu():
+    #print the menu
+    print(UserMenu.TRANSACTION_REGISTRATION.value[0], UserMenu.MANAGE_CATEGORIES.value[0],
+           UserMenu.BILL.value[0], UserMenu.STATISTICS_AND_REPORTING.value[0], UserMenu.BACK.value[0], 'choose your command...', sep='\n')
+    
+    #give the command
+    choice = valid_command()
+
+    #match the options with user choice
+    while True:
+            if choice == UserMenu.TRANSACTION_REGISTRATION.value[1]:
+                break
+            elif choice == UserMenu.MANAGE_CATEGORIES.value[1]:
+                break
+            elif choice == UserMenu.BILL.value[1]:
+                break
+            elif choice == UserMenu.STATISTICS_AND_REPORTING.value[1]:
+                break
+            elif choice == UserMenu.BACK.value[1]:
+                os.system('cls')
+                main_menu()
+                break
+            else:
+                print('Invalid command. try again')
+                choice = valid_command()
+
 
 #give the valid command from user
 def valid_command():
@@ -39,7 +72,7 @@ def valid_command():
             valid_input = int(user_input)
             break
         except ValueError:
-            print("Invalid command. choose another one")
+            print("Please enter a number. try again")
     return valid_input
 
 
@@ -65,28 +98,31 @@ def sign_up():
         "cash": 0
     }
     append_to_file(user_info)
-
+    
+    os.system('cls')
+    user_menu()
 
 #user sign in to the account
 def sign_in():
     os.system('cls')
-    username = input('Enter your username \n')
+    username = input('Enter your username \n').strip()
 
     username_info = ()
     while True:
         username_info = uniq_username(username)
         if username_info[0]:
-            username = input("username not found. try another \n")
+            username = input("username not found. try again \n").strip()
         else:
             break
     
-    password = input('Enter your password \n')
+    password = input('Enter your password \n').strip()
     while True:
         if username_info[1] == password:
-            print('your pass is correct')
+            os.system('cls')
+            user_menu()
             break
         else:
-            password = input('your pass is wrong. try another \n')
+            password = input('your pass is wrong. try again \n').strip()
 
 
 #check if the user name is uniq or not
@@ -130,7 +166,7 @@ def valid_password(password):
 def valid_password_lenth(password):
 
     if len(password) < 8:
-        print('your password should has at least 8 characters. try another')
+        print('your password should has at least 8 characters. try again')
         return False
     else:
         return True
@@ -138,7 +174,7 @@ def valid_password_lenth(password):
 def valid_password_upercase(password):
    
     if not re.search(r"[A-Z]", password):
-        print('your password should has at least one uppercase letter. try another')
+        print('your password should has at least one uppercase letter. try again')
         return False
     else:
         return True
@@ -146,7 +182,7 @@ def valid_password_upercase(password):
 def valid_password_lowercase(password):
     
     if not re.search(r"[a-z]", password):
-        print('your password should has at least one lowercase letter. try another')
+        print('your password should has at least one lowercase letter. try again')
         return False
     else:
         return True
@@ -154,7 +190,7 @@ def valid_password_lowercase(password):
 def valid_password_digit(password):
 
     if not re.search(r"\d", password):
-        print('your password should has at least one digit. try another')
+        print('your password should has at least one digit. try again')
         return False
     else:
         return True
@@ -162,7 +198,7 @@ def valid_password_digit(password):
 def valid_password_character(password):
     
     if not re.search(r"[*$#@!]", password): 
-        print('your password should has at least least one special character (*$#@!). try another')
+        print('your password should has at least least one special character (*$#@!). try again')
         return False
     else:
         return True       
