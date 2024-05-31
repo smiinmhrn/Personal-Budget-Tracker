@@ -98,7 +98,8 @@ def sign_up():
         "name": name,
         "username": username,
         "password": password,
-        "cash": 0
+        "cash": 0,
+        "transactions" : []
     }
     append_to_file(user_info)
     
@@ -225,7 +226,7 @@ def append_to_file(new_data):
 
     # Write updated data back to file
     with open("account.json", "w") as file:
-        json.dump(data, file, indent= 4)
+        json.dump(data, file, indent= 5)
 
 
 
