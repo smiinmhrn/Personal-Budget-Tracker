@@ -87,7 +87,10 @@ def Transaction_registration():
     category = valid_string_input(input("enter the category of transport: "))
 
     #create an id for every transaction to undrestand which transaction did earlier
-    transaction_id = len(global_user_info["transactions"]) + 1
+    transaction_id = 1
+    if len(global_user_info["transactions"]) != 0:
+        transaction_id = transaction_id + global_user_info["transactions"][-1]["id"]
+
 
     #make a dictionary of it to save
     transactions = {
@@ -96,7 +99,7 @@ def Transaction_registration():
         "depositor": depositor,
         "amount": amount,
         "date": date,
-        "category": category
+        "category": category,
     }
 
 
