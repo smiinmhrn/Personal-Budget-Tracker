@@ -17,6 +17,11 @@ class UserMenu(Enum):
     STATISTICS_AND_REPORTING = ("4. Statistics and reporting", 4)
     BACK = ("5. Back", 5)
 
+class BillMenu(Enum):
+    SHOW = ("1. Show", 1)
+    FILTER = ("2. Filter", 2)
+    SORT = ("3. Sort", 3)
+
 global_user_info = {}
 
 def main_menu():
@@ -55,6 +60,7 @@ def user_menu():
             elif choice == UserMenu.MANAGE_CATEGORIES.value[1]:
                 break
             elif choice == UserMenu.BILL.value[1]:
+                bill()
                 break
             elif choice == UserMenu.STATISTICS_AND_REPORTING.value[1]:
                 break
@@ -134,6 +140,25 @@ def Transaction_registration():
     else:
         os.system('cls')
         user_menu()
+
+#creat bill menu
+def bill():
+
+    print("[ BILL ]")
+    print(BillMenu.SHOW.value[0], BillMenu.FILTER.value[0], BillMenu.SORT.value[0], sep='\n')
+
+    choice = valid_number_input(input("choose your command... \n"))
+
+    #match the options with user choice
+    while True:
+        if choice == BillMenu.SHOW.value[1]:
+            break
+        elif choice == BillMenu.FILTER.value[2]:
+            break
+        elif choice == BillMenu.SORT.value[3]:
+            break
+        else:
+            choice = valid_number_input(input("Invalid command. choose another one \n"))
 
 
 #get a valid input for money
