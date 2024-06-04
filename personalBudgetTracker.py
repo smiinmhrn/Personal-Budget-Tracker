@@ -4,6 +4,7 @@ import json
 import re
 from datetime import datetime
 
+
 class FirstMenu(Enum):
     SIGN_UP = ("1. Sign Up", 1)
     SIGN_IN = ("2. Sign in", 2)
@@ -62,7 +63,7 @@ def user_menu():
                 main_menu()
                 break
             else:
-                choice = valid_number_input('Invalid command. try again \n')
+                choice = valid_number_input(input('Invalid command. try again \n'))
 
 
 #do and write the transactions into file
@@ -82,7 +83,7 @@ def Transaction_registration():
     #give the info of transaction from user 
     receiver = valid_string_input(input("enter the name of receiver: "))
     depositor = valid_string_input(input("enter the name of depositor: "))
-    amount = valid_number_input(input("enter the amount of money of transport: "))
+    amount = valid_money_input()
     date = str(get_user_date())
     category = valid_string_input(input("enter the category of transport: "))
 
@@ -133,6 +134,23 @@ def Transaction_registration():
     else:
         os.system('cls')
         user_menu()
+
+
+#get a valid input for money
+def valid_money_input(prompt="Enter the amount of money: "):
+    while True:
+        user_input = input(prompt)
+        try:
+            # Try converting the input to a int 
+            amount = int(user_input)
+            # Check if the amount is positive
+            if amount < 0:
+                print("Please enter a positive amount.")
+            else:
+                return amount
+        except ValueError:
+            # If conversion fails, print an error message
+            print("Invalid input. Please enter a valid number.")
 
 
 #check the date format for transactions
