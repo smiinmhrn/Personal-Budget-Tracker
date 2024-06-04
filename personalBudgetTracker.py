@@ -21,7 +21,7 @@ class BillMenu(Enum):
     SHOW = ("1. Show", 1)
     FILTER = ("2. Filter", 2)
     SORT = ("3. Sort", 3)
-
+    BACK = ("4. Back", 4)
 global_user_info = {}
 
 def main_menu():
@@ -130,12 +130,13 @@ def Transaction_registration():
     command = valid_number_input(input("Transaction saved sucsesfully.\n1. Add another          2. Back\n"))
 
     while True:
-        if command != 1 and transaction_type != 2:
+        if command != 1 and command != 2:
             command = valid_number_input(input("choose from options above \n"))
         else: 
             break
     
     if command == 1:
+        os.system('cls')
         Transaction_registration()
     else:
         os.system('cls')
@@ -143,22 +144,69 @@ def Transaction_registration():
 
 #creat bill menu
 def bill():
-
+    os.system('cls')
     print("[ BILL ]")
-    print(BillMenu.SHOW.value[0], BillMenu.FILTER.value[0], BillMenu.SORT.value[0], sep='\n')
+    print(BillMenu.SHOW.value[0], BillMenu.FILTER.value[0], BillMenu.SORT.value[0], BillMenu.BACK.value[0], sep='\n')
 
     choice = valid_number_input(input("choose your command... \n"))
 
     #match the options with user choice
     while True:
         if choice == BillMenu.SHOW.value[1]:
+            show_bill()
             break
-        elif choice == BillMenu.FILTER.value[2]:
+        elif choice == BillMenu.FILTER.value[1]:
             break
-        elif choice == BillMenu.SORT.value[3]:
+        elif choice == BillMenu.SORT.value[1]:
+            break
+        elif choice == BillMenu.BACK.value[1]:
+            user_menu()
             break
         else:
             choice = valid_number_input(input("Invalid command. choose another one \n"))
+
+def show_bill():
+    os.system('cls')
+    print("[ SHOW BILL ]")
+    choice = valid_number_input(input("how many bill you want to see.\n1. 10          2. 50          3. all\n"))
+
+    while True:
+        if choice != 1 and choice != 2 and choice != 3:
+            choice = valid_number_input(input("choose from options above \n"))
+        else: 
+            break
+    
+    if choice == 1:
+        print_bill(10)
+    elif choice == 2:
+        print_bill(50)
+    else:
+        pass
+        print_bill(len(global_user_info["transactions"]))
+
+    command = valid_number_input(input("Result showed sucsesfully.\n1. Show Again          2. Back\n"))
+
+    while True:
+        if command != 1 and command != 2:
+            command = valid_number_input(input("choose from options above \n"))
+        else: 
+            break
+    
+    if command == 1:
+        os.system('cls')
+        show_bill()
+    else:
+        os.system('cls')
+        bill()
+
+
+def print_bill(number_of_bill):
+    if number_of_bill >= len(global_user_info["transactions"]):
+        for transaction in global_user_info["transactions"]:
+            print("".join(f"{key}: {value} " for key, value in transaction.items()))
+    else:
+        for transaction in global_user_info["transactions"][-number_of_bill:]:
+            print("".join(f"{key}: {value} " for key, value in transaction.items()))
 
 
 #get a valid input for money
