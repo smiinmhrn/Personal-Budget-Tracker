@@ -1,3 +1,10 @@
+#BUGS TO FIX RIMINDER
+# IF THE JSON FILE IS EMPTY WE HAVE A ERROR IN SIGHN UP
+# IF THE AMOUNT OF USER CASH IS NOT ENOUGH FOR COST THEN WHAT ?
+
+
+
+
 from enum import Enum
 import os
 import json
@@ -17,18 +24,13 @@ class UserMenu(Enum):
     STATISTICS_AND_REPORTING = ("4. Statistics and reporting", 4)
     BACK = ("5. Back", 5)
 
-class BillMenu(Enum):
-    SHOW = ("1. Show", 1)
-    FILTER = ("2. Filter", 2)
-    SORT = ("3. Sort", 3)
-    BACK = ("4. Back", 4)
 global_user_info = {}
 
 def main_menu():
     #print the menu
     print(FirstMenu.SIGN_UP.value[0], FirstMenu.SIGN_IN.value[0], FirstMenu.EXIST.value[0], sep='\n')
 
-    #give the command
+    #get the command
     choice = valid_number_input(input("choose your command... \n"))
 
     #match the options with user choice
@@ -45,14 +47,12 @@ def main_menu():
             choice = valid_number_input(input("Invalid command. choose another one \n"))
 
 def user_menu():
-    #print the menu
+    
     print(UserMenu.TRANSACTION_REGISTRATION.value[0], UserMenu.MANAGE_CATEGORIES.value[0],
            UserMenu.BILL.value[0], UserMenu.STATISTICS_AND_REPORTING.value[0], UserMenu.BACK.value[0], sep='\n')
     
-    #give the command
     choice = valid_number_input(input("choose your command...\n"))
 
-    #match the options with user choice
     while True:
             if choice == UserMenu.TRANSACTION_REGISTRATION.value[1]:
                 Transaction_registration()
@@ -60,7 +60,7 @@ def user_menu():
             elif choice == UserMenu.MANAGE_CATEGORIES.value[1]:
                 break
             elif choice == UserMenu.BILL.value[1]:
-                bill()
+                show_bill()
                 break
             elif choice == UserMenu.STATISTICS_AND_REPORTING.value[1]:
                 break
@@ -84,6 +84,10 @@ def Transaction_registration():
         if transaction_type != 1 and transaction_type != 2:
             transaction_type = valid_number_input(input("choose from options above \n"))
         else: 
+            if transaction_type == 1:
+                transaction_type = "Income"
+            else:
+                transaction_type = "Cost"
             break
 
     #give the info of transaction from user 
@@ -93,7 +97,7 @@ def Transaction_registration():
     date = str(get_user_date())
     category = valid_string_input(input("enter the category of transport: "))
 
-    #create an id for every transaction to undrestand which transaction did earlier
+    #create an id for every transaction to accses the special transaction
     transaction_id = 1
     if len(global_user_info["transactions"]) != 0:
         transaction_id = transaction_id + global_user_info["transactions"][-1]["id"]
@@ -102,6 +106,7 @@ def Transaction_registration():
     #make a dictionary of it to save
     transactions = {
         "id": transaction_id,
+        "type": transaction_type,
         "reciver": receiver,
         "depositor": depositor,
         "amount": amount,
@@ -111,7 +116,7 @@ def Transaction_registration():
 
 
     #check if the transaction is income increase the user cash else decrease it and update the user cash
-    if transaction_type == 1 :
+    if transaction_type == "Income" :
         global_user_info["cash"] = global_user_info["cash"] + amount
     else:
         global_user_info["cash"] = global_user_info["cash"] - amount
@@ -142,48 +147,67 @@ def Transaction_registration():
         os.system('cls')
         user_menu()
 
-#creat bill menu
-def bill():
-    os.system('cls')
-    print("[ BILL ]")
-    print(BillMenu.SHOW.value[0], BillMenu.FILTER.value[0], BillMenu.SORT.value[0], BillMenu.BACK.value[0], sep='\n')
 
-    choice = valid_number_input(input("choose your command... \n"))
-
-    #match the options with user choice
-    while True:
-        if choice == BillMenu.SHOW.value[1]:
-            show_bill()
-            break
-        elif choice == BillMenu.FILTER.value[1]:
-            break
-        elif choice == BillMenu.SORT.value[1]:
-            break
-        elif choice == BillMenu.BACK.value[1]:
-            user_menu()
-            break
-        else:
-            choice = valid_number_input(input("Invalid command. choose another one \n"))
-
+#show the number of bills that user wanted
 def show_bill():
     os.system('cls')
     print("[ SHOW BILL ]")
-    choice = valid_number_input(input("how many bill you want to see.\n1. 10          2. 50          3. all\n"))
+
+    result = []
+
+    #show the transactions base on user expectation
+    choice_the_type = valid_number_input(input("which bills you want to see?\n1. Incomes          2. Costs          3. all\n"))
 
     while True:
-        if choice != 1 and choice != 2 and choice != 3:
-            choice = valid_number_input(input("choose from options above \n"))
-        else: 
+        if choice_the_type != 1 and choice_the_type != 2 and choice_the_type != 3:
+            choice_the_type = valid_number_input(input("choose from options above \n"))
+        else:
+            if choice_the_type == 1:
+                choice_the_type = "Income"
+                result = filter(choice_the_type, global_user_info["transactions"])
+
+            elif choice_the_type == 2:
+                choice_the_type = "Cost"
+                result = filter(choice_the_type, global_user_info["transactions"])
+            else:
+                result = global_user_info["transactions"]
+            break
+
+    
+    choice_to_prnit = valid_number_input(input("how many bill you want to see?\n1. 10          2. 50          3. all\n"))
+
+    while True:
+        if choice_to_prnit != 1 and choice_to_prnit != 2 and choice_to_prnit != 3:
+            choice_to_prnit = valid_number_input(input("choose from options above \n"))
+        else:
+            if choice_to_prnit == 1:
+                result = number_of_bill(10, result)
+            elif choice_to_prnit == 2:
+                result = number_of_bill(50, result)
             break
     
-    if choice == 1:
-        print_bill(10)
-    elif choice == 2:
-        print_bill(50)
-    else:
-        pass
-        print_bill(len(global_user_info["transactions"]))
+    
+    choice_to_sort = valid_number_input(input("How do you want to sort by the amount?\n1. ascending          2. Descending          3. Dont\n"))
 
+    while True:
+        if choice_to_sort != 1 and choice_to_sort != 2 and choice_to_sort != 3:
+            choice_to_sort = valid_number_input(input("choose from options above \n"))
+        else:
+            if choice_to_sort == 1:
+                result = sorted(result, key=lambda x: x['amount']) 
+            elif choice_to_sort == 2:
+                result = sorted(result, key=lambda x: x['amount'], reverse=True)
+            break
+    
+    
+    #clean the consol and print the total cash, total incomes, total costs and all filterd transactions
+    os.system("cls")
+    print(f"Total Cash : {total_user_transactions()[2]}")
+    print(f"Total Incomes : {total_user_transactions()[0]}          Total Costs : {total_user_transactions()[1]} \n")
+    print_array_of_dict(result)
+
+
+    #access the user to show again the transcations or back to previous menue
     command = valid_number_input(input("Result showed sucsesfully.\n1. Show Again          2. Back\n"))
 
     while True:
@@ -197,16 +221,52 @@ def show_bill():
         show_bill()
     else:
         os.system('cls')
-        bill()
+        user_menu()
 
 
-def print_bill(number_of_bill):
-    if number_of_bill >= len(global_user_info["transactions"]):
-        for transaction in global_user_info["transactions"]:
-            print("".join(f"{key}: {value} " for key, value in transaction.items()))
+#return the totall amount of each transactions and all users money as touple 
+def total_user_transactions():
+    Incomes = 0
+    Costs = 0
+    for transaction in global_user_info["transactions"]:
+        if transaction["type"] == "Income":
+            Incomes = Incomes + transaction["amount"]
+        else:
+            Costs = Costs + transaction["amount"]
+    return (Incomes, Costs, global_user_info["cash"])
+
+
+#print the dictionary in column way base on the keys
+def print_array_of_dict(dict_array):
+    # Determine the maximum width for each key
+    keys = dict_array[0].keys()
+    max_widths = {key: max(len(str(key)), max(len(str(d[key])) for d in dict_array)) for key in keys}
+    
+    # Print the header
+    header = "     ".join(f"{key:<{max_widths[key]}}" for key in keys)
+    print(header)
+    print("=" * len(header))
+    
+    # Print each transaction in column format
+    for transaction in dict_array:
+        print("     ".join(f"{str(value):<{max_widths[key]}}" for key, value in transaction.items()))
+
+
+#return the number of transaction that user wanted
+def number_of_bill(number_of_bill, info_array):
+    if number_of_bill >= len(info_array):
+        return info_array
     else:
-        for transaction in global_user_info["transactions"][-number_of_bill:]:
-            print("".join(f"{key}: {value} " for key, value in transaction.items()))
+        return info_array[-number_of_bill:]
+
+
+#filter and return the transactons base on incomes or costs
+def filter(to_filter, info_array):
+    if to_filter == "Income":
+        info_array = [transaction for transaction in info_array if transaction["type"] == "Income"]
+    else:
+        info_array = [transaction for transaction in info_array if transaction["type"] == "Cost"]
+    return info_array
 
 
 #get a valid input for money
@@ -295,6 +355,7 @@ def sign_up():
     
     os.system('cls')
     user_menu()
+
 
 #user sign in to the account
 def sign_in():
