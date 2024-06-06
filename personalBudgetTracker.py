@@ -95,17 +95,17 @@ def Transaction_registration():
     depositor = valid_string_input(input("enter the name of depositor: "))
     amount = valid_money_input()
     date = str(get_user_date())
-    category = valid_string_input(input("enter the category of transport: "))
+    category = get_category_input()
 
-    #create an id for every transaction to accses the special transaction
-    transaction_id = 1
-    if len(global_user_info["transactions"]) != 0:
-        transaction_id = transaction_id + global_user_info["transactions"][-1]["id"]
+    # #create an id for every transaction to accses the special transaction
+    # transaction_id = 1
+    # if len(global_user_info["transactions"]) != 0:
+    #     transaction_id = transaction_id + global_user_info["transactions"][-1]["id"]
 
 
     #make a dictionary of it to save
     transactions = {
-        "id": transaction_id,
+        # "id": transaction_id,
         "type": transaction_type,
         "reciver": receiver,
         "depositor": depositor,
@@ -148,6 +148,23 @@ def Transaction_registration():
         user_menu()
 
 
+def get_category_input():
+    print("Choose the category you want: ")
+    for index, category in enumerate(global_user_info["categories"], start=1):
+        print(f"{index}. {category}")
+
+    user_category = valid_number_input(input("choose from above     or     0. add more \n"))
+
+    while True:
+        if user_category >= 0 and user_category <= len(global_user_info["categories"]):
+            break
+        else:
+            user_category = valid_number_input(input("choose from options above \n"))
+    
+    if user_category == 0:
+        return "functon"
+    return global_user_info["categories"][user_category - 1]
+    
 #show the number of bills that user wanted
 def show_bill():
     os.system('cls')
@@ -349,6 +366,7 @@ def sign_up():
         "username": username,
         "password": password,
         "cash": 0,
+        "categories": ["food", "wearing", "trasports"],
         "transactions" : []
     }
     append_to_file(global_user_info)
