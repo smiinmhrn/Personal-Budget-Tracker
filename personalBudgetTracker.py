@@ -176,6 +176,7 @@ def mange_categories():
     
     if user_activity == 1:
        add_new_category()
+       back_perivious()
     elif user_activity == 2:
         remove_category()
     elif user_activity == 3:
@@ -197,8 +198,6 @@ def add_new_category():
             delete_from_json()
             append_to_file(global_user_info)
             break
-
-    back_perivious()
 
 
 #let user to remove a aspecial category
@@ -298,7 +297,8 @@ def get_category_input():
             user_category = valid_number_input(input("choose from options above \n"))
     
     if user_category == 0:
-        return "functon"
+        add_new_category()
+        return global_user_info["categories"][len(global_user_info["categories"]) - 1]
     return global_user_info["categories"][user_category - 1]
 
 
