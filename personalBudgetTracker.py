@@ -2,7 +2,7 @@
 
 # IF THE JSON FILE IS EMPTY WE HAVE A ERROR IN SIGHN UP
 # IF THE AMOUNT OF USER CASH IS NOT ENOUGH FOR COST THEN WHAT ?
-# CATEGORIES MANAGEMENT HAS BUGS TO FIX
+# CATEGORIES MANAGEMENT -> has bug in delet
 
 
 
@@ -151,17 +151,22 @@ def Transaction_registration():
         os.system('cls')
         user_menu()
 
+
+#use to print the category list
 def print_categories():
     for index, category in enumerate(global_user_info["categories"], start=1):
         print(f"{index}. {category}")
     print()
 
+
+#do the mange categories option in user menu
 def mange_categories():
     os.system("cls")
-    print("[ ACCESSIBLE CATEGORIES ] \n")
+    print("[ ACCESSIBLE CATEGORIES ]")
+    print("The category list is as follows: \n")
     print_categories()
 
-    user_activity = valid_number_input(input("1.Add          2.Delete          3.Edit          4.Back \n"))
+    user_activity = valid_number_input(input("1.Add          2.Delete          3.Edit          4.Back \nchoose your action: "))
 
     while True:
         if user_activity >= 1 and user_activity <= 4:
@@ -180,6 +185,7 @@ def mange_categories():
         user_menu()
 
 
+#let user to customis the category list by adding new categories
 def add_new_category():
     new_category = valid_string_input(input("Enter the name of the new category: ").lower())
 
@@ -192,8 +198,10 @@ def add_new_category():
             append_to_file(global_user_info)
             break
 
+    back_perivious()
 
 
+#let user to remove a aspecial category
 def remove_category():
     deleted_category = valid_string_input(input("Enter the name of the category that want to delete: ").lower())
 
@@ -224,8 +232,10 @@ def remove_category():
         else:
             deleted_category = valid_string_input(input("This name of the category does not exitsted. try again").lower())
 
+    back_perivious()
 
 
+#let user to edit name of the category
 def edit_category():
     edit_category = valid_string_input(input("Enter the name of the category to edit: ").lower())
 
@@ -251,6 +261,26 @@ def edit_category():
             break
         else:
             edit_category = valid_string_input(input("This category does not existed. try again: ").lower())
+    
+    back_perivious()
+
+
+#access the user to show and do other actions or back to previous menue for manage categories
+def back_perivious():
+    command = valid_number_input(input("The new category is added sucssecfully.\n1. Do other actions          2. Back to perivious menu\n"))
+
+    while True:
+        if command != 1 and command != 2:
+            command = valid_number_input(input("choose from options above \n"))
+        else: 
+            break
+    
+    if command == 1:
+        os.system('cls')
+        mange_categories()
+    else:
+        os.system('cls')
+        user_menu()
 
 
 #get the category from defualt or add new
