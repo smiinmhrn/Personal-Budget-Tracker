@@ -1,6 +1,8 @@
 #BUGS TO FIX RIMINDER
+
 # IF THE JSON FILE IS EMPTY WE HAVE A ERROR IN SIGHN UP
 # IF THE AMOUNT OF USER CASH IS NOT ENOUGH FOR COST THEN WHAT ?
+# CATEGORIES MANAGEMENT HAS BUGS TO FIX
 
 
 
@@ -10,6 +12,7 @@ import os
 import json
 import re
 from datetime import datetime
+import keyboard
 
 
 class FirstMenu(Enum):
@@ -58,6 +61,7 @@ def user_menu():
                 Transaction_registration()
                 break
             elif choice == UserMenu.MANAGE_CATEGORIES.value[1]:
+                mange_categories()
                 break
             elif choice == UserMenu.BILL.value[1]:
                 show_bill()
@@ -147,11 +151,113 @@ def Transaction_registration():
         os.system('cls')
         user_menu()
 
-
-def get_category_input():
-    print("Choose the category you want: ")
+def print_categories():
     for index, category in enumerate(global_user_info["categories"], start=1):
         print(f"{index}. {category}")
+    print()
+
+def mange_categories():
+    os.system("cls")
+    print("[ ACCESSIBLE CATEGORIES ] \n")
+    print_categories()
+
+    user_activity = valid_number_input(input("1.Add          2.Delete          3.Edit          4.Back \n"))
+
+    while True:
+        if user_activity >= 1 and user_activity <= 4:
+            break
+        else:
+            user_activity = valid_number_input(input("choose from options above \n"))
+    
+    if user_activity == 1:
+       add_new_category()
+    elif user_activity == 2:
+        remove_category()
+    elif user_activity == 3:
+        edit_category()
+    else:
+        os.system("cls")
+        user_menu()
+
+
+def add_new_category():
+    new_category = valid_string_input(input("Enter the name of the new category: ").lower())
+
+    while True:
+        if new_category in global_user_info["categories"]:
+            new_category = valid_string_input(input("This name of category already used enter another name for new category: ").lower())
+        else:
+            global_user_info["categories"].append(new_category)
+            delete_from_json()
+            append_to_file(global_user_info)
+            break
+
+
+
+def remove_category():
+    deleted_category = valid_string_input(input("Enter the name of the category that want to delete: ").lower())
+
+    while True:
+        if deleted_category in global_user_info["categories"]:
+            print("If you delete this, all of your transactions in this category will be deleted. Are you sure?")
+            print("Press Enter to confirm or Escape to cancel.")
+    
+            while True:
+                if keyboard.is_pressed('enter'):
+                    print("You pressed Enter. The action will proceed.")
+
+                    filtered_transactions = [transaction for transaction in global_user_info["transactions"] 
+                                             if transaction['category'] != deleted_category]
+                    
+                    global_user_info["transactions"] = filtered_transactions
+                    global_user_info["categories"].remove(deleted_category)
+    
+                    print("delete succsefully")
+                    break
+                elif keyboard.is_pressed('esc'):
+                    print("You pressed Escape. The action is cancelled.")
+                    break
+            
+            delete_from_json()
+            append_to_file(global_user_info)
+            break
+        else:
+            deleted_category = valid_string_input(input("This name of the category does not exitsted. try again").lower())
+
+
+
+def edit_category():
+    edit_category = valid_string_input(input("Enter the name of the category to edit: ").lower())
+
+    while True:
+        if edit_category in global_user_info["categories"]:
+            new_name = valid_string_input(input("Enter the new name of this category: ").lower())
+
+            while True:
+                if new_name in global_user_info["categories"]:
+                    new_name = valid_string_input(input("This name of category is already existed. choose another: ").lower())
+                else:
+                    for transaction in global_user_info["transactions"]:
+                        if transaction["category"] == edit_category:
+                            transaction["category"] = new_name
+
+                    global_user_info["categories"].remove(edit_category)
+                    global_user_info["categories"].append(new_name)
+
+                    delete_from_json()
+                    append_to_file(global_user_info)
+                    break
+
+            break
+        else:
+            edit_category = valid_string_input(input("This category does not existed. try again: ").lower())
+
+
+#get the category from defualt or add new
+def get_category_input():
+    print("Choose the category you want: ")
+
+    print_categories()
 
     user_category = valid_number_input(input("choose from above     or     0. add more \n"))
 
@@ -164,7 +270,8 @@ def get_category_input():
     if user_category == 0:
         return "functon"
     return global_user_info["categories"][user_category - 1]
-    
+
+
 #show the number of bills that user wanted
 def show_bill():
     os.system('cls')
