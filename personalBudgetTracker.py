@@ -1,6 +1,6 @@
 #BUGS TO FIX RIMINDER
 
-# IF THE JSON FILE IS EMPTY WE HAVE A ERROR IN SIGHN UP
+
 # IF THE AMOUNT OF USER CASH IS NOT ENOUGH FOR COST THEN WHAT ?
 # CATEGORIES MANAGEMENT -> has bug in delet
 
@@ -12,7 +12,6 @@ import os
 import json
 import re
 import keyboard
-from collections import defaultdict
 import datetime
 
 class FirstMenu(Enum):
@@ -680,16 +679,19 @@ def uniq_username(username):
 
     try:
         with open("account.json", "r") as file:
-            data = json.load(file)
+            file_content = file.read().strip()
+            if not file_content:  # Check if the file is empty
+                return True
+            data = json.loads(file_content)
     except FileNotFoundError:
         data = []
         return True
+    
     for user_data in data:
         if user_data["username"] == username:
             global_user_info = user_data
             return False
-        else:
-            return True
+    return True
 
 
 #insure that all the pass format is correct
@@ -761,7 +763,11 @@ def append_to_file(new_data):
     try:
         # Read existing data from file, if any
         with open("account.json", "r") as file:
-            data = json.load(file)
+            file_content = file.read().strip()
+            if file_content:
+                data = json.loads(file_content)
+            else:
+                data = []
     except FileNotFoundError:
         # If file doesn't exist, initialize with an empty list
         data = []
@@ -771,7 +777,7 @@ def append_to_file(new_data):
 
     # Write updated data back to file
     with open("account.json", "w") as file:
-        json.dump(data, file, indent= 5)
+        json.dump(data, file, indent=2)
 
 
 #delete a specific object from json and file and write the file 
@@ -787,6 +793,6 @@ def delete_from_json():
 
     # Save updated JSON data back to file
     with open('account.json', 'w') as file:
-        json.dump(filtered_data, file, indent=5)
+        json.dump(filtered_data, file, indent=2)
 
 main_menu()
