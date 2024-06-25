@@ -11,9 +11,9 @@ from enum import Enum
 import os
 import json
 import re
-from datetime import datetime
 import keyboard
-
+from collections import defaultdict
+import datetime
 
 class FirstMenu(Enum):
     SIGN_UP = ("1. Sign Up", 1)
@@ -67,6 +67,7 @@ def user_menu():
                 show_bill()
                 break
             elif choice == UserMenu.STATISTICS_AND_REPORTING.value[1]:
+                reportes()
                 break
             elif choice == UserMenu.BACK.value[1]:
                 os.system('cls')
@@ -378,6 +379,104 @@ def show_bill():
         user_menu()
 
 
+#show the report part of the menu
+def reportes():
+    find_least_and_most_income_and_cost_day(global_user_info["transactions"])
+    find_least_and_most_income_and_cost_months(global_user_info["transactions"])
+
+
+def find_least_and_most_income_and_cost_day(transactions):
+    # Initialize dictionaries to store sums of costs and incomes
+    costs = defaultdict(int)
+    incomes = defaultdict(int)
+
+    # Process transactions
+    for transaction in transactions:
+        date = transaction["date"]
+        amount = transaction["amount"]
+        if transaction["type"] == "cost":
+            costs[date] += amount
+        elif transaction["type"] == "income":
+            incomes[date] += amount
+
+    # Ensure all dates have both cost and income initialized to 0
+    all_dates = set(costs.keys()).union(set(incomes.keys()))
+    for date in all_dates:
+        if date not in costs:
+            costs[date] = 0
+        if date not in incomes:
+            incomes[date] = 0
+
+    # Find the days with the maximum income and cost
+    max_income_day = max(incomes, key=incomes.get)
+    max_cost_day = max(costs, key=costs.get)
+
+    # Find the days with the minimum income and cost
+    min_income_day = min(incomes, key=incomes.get)
+    min_cost_day = min(costs, key=costs.get)
+
+    print(f"The most income day: {max_income_day} with amount {incomes[max_income_day]}")
+    print(f"The most cost day: {max_cost_day} with amount {costs[max_cost_day]}")
+    print(f"The least income day: {min_income_day} with amount {incomes[min_income_day]}")
+    print(f"The least cost day: {min_cost_day} with amount {costs[min_cost_day]}")
+
+
+def find_least_and_most_income_and_cost_months(transactions):
+    month_totals = {}
+
+    for transaction in transactions:
+        amount = int(transaction['amount'])
+        date_str = transaction['date']
+        date = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+        month_key = date.strftime('%Y-%m')
+
+        if month_key not in month_totals:
+            month_totals[month_key] = {'income': 0, 'cost': 0}
+
+        if transaction['type'] == 'income':
+            month_totals[month_key]['income'] += amount
+        elif transaction['type'] == 'cost':
+            month_totals[month_key]['cost'] += amount
+
+    least_income_month = None
+    least_income_amount = float('inf')
+    least_cost_month = None
+    least_cost_amount = float('inf')
+    most_income_month = None
+    most_income_amount = -float('inf')
+    most_cost_month = None
+    most_cost_amount = -float('inf')
+
+    for month_key, totals in month_totals.items():
+        income = totals['income']
+        cost = totals['cost']
+
+        # Find least income month
+        if income < least_income_amount:
+            least_income_amount = income
+            least_income_month = month_key
+
+        # Find least cost month
+        if cost < least_cost_amount:
+            least_cost_amount = cost
+            least_cost_month = month_key
+
+        # Find most income month
+        if income > most_income_amount:
+            most_income_amount = income
+            most_income_month = month_key
+
+        # Find most cost month
+        if cost > most_cost_amount:
+            most_cost_amount = cost
+            most_cost_month = month_key
+
+    print(f"The least income month is: {least_income_month}")
+    print(f"The least cost month is: {least_cost_month}")
+    print(f"The most income month is: {most_income_month}")
+    print(f"The most cost month is: {most_cost_month}")
+
+    
 #return the totall amount of each transactions and all users money as touple 
 def total_user_transactions():
     Incomes = 0
