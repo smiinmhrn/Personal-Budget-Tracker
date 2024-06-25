@@ -126,6 +126,13 @@ def Transaction_registration():
     else:
         global_user_info["cash"] = global_user_info["cash"] - amount
     
+    #for finding the max cash in the account
+    if global_user_info["cash"] > global_user_info["maxCash"]:
+        global_user_info["maxCash"] = global_user_info["cash"]
+    
+    #for finding the min cash in the account
+    if global_user_info["cash"] < global_user_info["minCash"]:
+        global_user_info["minCash"] = global_user_info["cash"]
 
     #update and add the new transaction into user account
     global_user_info["transactions"].append(transactions)
@@ -381,8 +388,26 @@ def show_bill():
 
 #show the report part of the menu
 def reportes():
+    os.system('cls')
+    print("[ STATISTICS AND REPORTING ]\n")
+
     find_least_and_most_income_and_cost_day(global_user_info["transactions"])
     find_least_and_most_income_and_cost_months(global_user_info["transactions"])
+    print(f'The maximum of the account cash is {global_user_info["maxCash"]}')
+    print(f'The minimum of the account cash is {global_user_info["minCash"]}\n')
+
+    #access the user back to previous menue
+    command = valid_number_input(input("Result showed sucsesfully.\n1. Back\n"))
+
+    while True:
+        if command != 1:
+            command = valid_number_input(input("choose from option above \n"))
+        else: 
+            break
+    
+    if command == 1:
+        os.system('cls')
+        user_menu()
 
 
 def find_least_and_most_income_and_cost_day(transactions):
@@ -415,10 +440,11 @@ def find_least_and_most_income_and_cost_day(transactions):
     min_income_day = min(incomes, key=incomes.get)
     min_cost_day = min(costs, key=costs.get)
 
-    print(f"The most income day: {max_income_day} with amount {incomes[max_income_day]}")
-    print(f"The most cost day: {max_cost_day} with amount {costs[max_cost_day]}")
-    print(f"The least income day: {min_income_day} with amount {incomes[min_income_day]}")
-    print(f"The least cost day: {min_cost_day} with amount {costs[min_cost_day]}")
+    print(f"The most income day is: {max_income_day}")
+    print(f"The most cost day is: {max_cost_day}\n")
+
+    print(f"The least income day: {min_income_day}")
+    print(f"The least cost day: {min_cost_day}\n")
 
 
 def find_least_and_most_income_and_cost_months(transactions):
@@ -472,9 +498,10 @@ def find_least_and_most_income_and_cost_months(transactions):
             most_cost_month = month_key
 
     print(f"The least income month is: {least_income_month}")
-    print(f"The least cost month is: {least_cost_month}")
+    print(f"The least cost month is: {least_cost_month}\n")
+
     print(f"The most income month is: {most_income_month}")
-    print(f"The most cost month is: {most_cost_month}")
+    print(f"The most cost month is: {most_cost_month}\n")
 
     
 #return the totall amount of each transactions and all users money as touple 
@@ -602,6 +629,8 @@ def sign_up():
         "username": username,
         "password": password,
         "cash": 0,
+        "maxCash": 0,
+        "minCash": 0,
         "categories": ["food", "wearing", "trasports"],
         "transactions" : []
     }
