@@ -3,7 +3,7 @@
 # IF THE JSON FILE IS EMPTY WE HAVE A ERROR IN SIGHN UP
 # IF THE AMOUNT OF USER CASH IS NOT ENOUGH FOR COST THEN WHAT ?
 # CATEGORIES MANAGEMENT -> has bug in delet
-# when want to show the bills if there is no transaction
+
 
 
 
@@ -104,7 +104,6 @@ def Transaction_registration():
 
     #make a dictionary of it to save
     transactions = {
-        # "id": transaction_id,
         "type": transaction_type,
         "reciver": receiver,
         "depositor": depositor,
@@ -306,61 +305,65 @@ def get_category_input():
 
 #show the number of bills that user wanted
 def show_bill():
+
     os.system('cls')
     print("[ SHOW BILL ]")
 
-    result = []
+    if not trasaction_existed():
+        print("THER IS NO TRANSACTION EXISTED\n")
+    else:
+        result = []
 
-    #show the transactions base on user expectation
-    choice_the_type = valid_number_input(input("which bills you want to see?\n1. Incomes          2. Costs          3. all\n"))
+        #show the transactions base on user expectation
+        choice_the_type = valid_number_input(input("which bills you want to see?\n1. Incomes          2. Costs          3. all\n"))
 
-    while True:
-        if choice_the_type != 1 and choice_the_type != 2 and choice_the_type != 3:
-            choice_the_type = valid_number_input(input("choose from options above \n"))
-        else:
-            if choice_the_type == 1:
-                choice_the_type = "Income"
-                result = filter(choice_the_type, global_user_info["transactions"])
-
-            elif choice_the_type == 2:
-                choice_the_type = "Cost"
-                result = filter(choice_the_type, global_user_info["transactions"])
+        while True:
+            if choice_the_type != 1 and choice_the_type != 2 and choice_the_type != 3:
+                choice_the_type = valid_number_input(input("choose from options above \n"))
             else:
-                result = global_user_info["transactions"]
-            break
+                if choice_the_type == 1:
+                    choice_the_type = "Income"
+                    result = filter(choice_the_type, global_user_info["transactions"])
 
-    
-    choice_to_prnit = valid_number_input(input("how many bill you want to see?\n1. 10          2. 50          3. all\n"))
+                elif choice_the_type == 2:
+                    choice_the_type = "Cost"
+                    result = filter(choice_the_type, global_user_info["transactions"])
+                else:
+                    result = global_user_info["transactions"]
+                break
 
-    while True:
-        if choice_to_prnit != 1 and choice_to_prnit != 2 and choice_to_prnit != 3:
-            choice_to_prnit = valid_number_input(input("choose from options above \n"))
-        else:
-            if choice_to_prnit == 1:
-                result = number_of_bill(10, result)
-            elif choice_to_prnit == 2:
-                result = number_of_bill(50, result)
-            break
-    
-    
-    choice_to_sort = valid_number_input(input("How do you want to sort by the amount?\n1. ascending          2. Descending          3. Dont\n"))
+        
+        choice_to_prnit = valid_number_input(input("how many bill you want to see?\n1. 10          2. 50          3. all\n"))
 
-    while True:
-        if choice_to_sort != 1 and choice_to_sort != 2 and choice_to_sort != 3:
-            choice_to_sort = valid_number_input(input("choose from options above \n"))
-        else:
-            if choice_to_sort == 1:
-                result = sorted(result, key=lambda x: x['amount']) 
-            elif choice_to_sort == 2:
-                result = sorted(result, key=lambda x: x['amount'], reverse=True)
-            break
-    
-    
-    #clean the consol and print the total cash, total incomes, total costs and all filterd transactions
-    os.system("cls")
-    print(f"Total Cash : {total_user_transactions()[2]}")
-    print(f"Total Incomes : {total_user_transactions()[0]}          Total Costs : {total_user_transactions()[1]} \n")
-    print_array_of_dict(result)
+        while True:
+            if choice_to_prnit != 1 and choice_to_prnit != 2 and choice_to_prnit != 3:
+                choice_to_prnit = valid_number_input(input("choose from options above \n"))
+            else:
+                if choice_to_prnit == 1:
+                    result = number_of_bill(10, result)
+                elif choice_to_prnit == 2:
+                    result = number_of_bill(50, result)
+                break
+        
+        
+        choice_to_sort = valid_number_input(input("How do you want to sort by the amount?\n1. ascending          2. Descending          3. Dont\n"))
+
+        while True:
+            if choice_to_sort != 1 and choice_to_sort != 2 and choice_to_sort != 3:
+                choice_to_sort = valid_number_input(input("choose from options above \n"))
+            else:
+                if choice_to_sort == 1:
+                    result = sorted(result, key=lambda x: x['amount']) 
+                elif choice_to_sort == 2:
+                    result = sorted(result, key=lambda x: x['amount'], reverse=True)
+                break
+        
+        
+        #clean the consol and print the total cash, total incomes, total costs and all filterd transactions
+        os.system("cls")
+        print(f"Total Cash : {total_user_transactions()[2]}")
+        print(f"Total Incomes : {total_user_transactions()[0]}          Total Costs : {total_user_transactions()[1]} \n")
+        print_array_of_dict(result)
 
 
     #access the user to show again the transcations or back to previous menue
@@ -411,7 +414,7 @@ def reportes():
         user_menu()
 
 
-#show if user have transactiones or not
+#show if user hase transactiones or not
 def trasaction_existed():
     if len(global_user_info["transactions"]) == 0:
         return False
