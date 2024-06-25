@@ -3,7 +3,7 @@
 # IF THE JSON FILE IS EMPTY WE HAVE A ERROR IN SIGHN UP
 # IF THE AMOUNT OF USER CASH IS NOT ENOUGH FOR COST THEN WHAT ?
 # CATEGORIES MANAGEMENT -> has bug in delet
-
+# when want to show the bills if there is no transaction
 
 
 
@@ -101,12 +101,6 @@ def Transaction_registration():
     amount = valid_money_input()
     date = str(get_user_date())
     category = get_category_input()
-
-    # #create an id for every transaction to accses the special transaction
-    # transaction_id = 1
-    # if len(global_user_info["transactions"]) != 0:
-    #     transaction_id = transaction_id + global_user_info["transactions"][-1]["id"]
-
 
     #make a dictionary of it to save
     transactions = {
@@ -391,13 +385,20 @@ def reportes():
     os.system('cls')
     print("[ STATISTICS AND REPORTING ]\n")
 
-    find_least_and_most_income_and_cost_day(global_user_info["transactions"])
-    find_least_and_most_income_and_cost_months(global_user_info["transactions"])
-    print(f'The maximum of the account cash is {global_user_info["maxCash"]}')
-    print(f'The minimum of the account cash is {global_user_info["minCash"]}\n')
+    #sure that the user has transactiones or not and print the result 
+    if not trasaction_existed():
+        print("There is no transaction existed\n".upper())
+    else:
+        find_min_max_month_day_cost_and_income(True, "Day")
+        find_min_max_month_day_cost_and_income(False, "Month")
+
+        print("================================================\n")
+        #print the most and least money that existed in account
+        print(f'The maximum of the account cash is {global_user_info["maxCash"]}')
+        print(f'The minimum of the account cash is {global_user_info["minCash"]}\n')
 
     #access the user back to previous menue
-    command = valid_number_input(input("Result showed sucsesfully.\n1. Back\n"))
+    command = valid_number_input(input("1. Back\n"))
 
     while True:
         if command != 1:
@@ -410,100 +411,106 @@ def reportes():
         user_menu()
 
 
-def find_least_and_most_income_and_cost_day(transactions):
-    # Initialize dictionaries to store sums of costs and incomes
-    costs = defaultdict(int)
-    incomes = defaultdict(int)
+#show if user have transactiones or not
+def trasaction_existed():
+    if len(global_user_info["transactions"]) == 0:
+        return False
+    return True
 
-    # Process transactions
-    for transaction in transactions:
+
+#find the max and min incomes and costs in days and monthes
+def find_min_max_month_day_cost_and_income(day, string):
+    #creat a matrix like this for days
+    #date         costs         incomes
+    #2024-02-02   200             0
+    #2023-02-02   200             500
+
+    #creat a matrix like this for monthes
+    #date     costs         incomes
+    #2024-02   200             0
+    #2023-02   200             500
+
+    date_matrix = [["date", "costs", "incomes"]]
+
+    for transaction in global_user_info["transactions"]:
         date = transaction["date"]
-        amount = transaction["amount"]
-        if transaction["type"] == "cost":
-            costs[date] += amount
-        elif transaction["type"] == "income":
-            incomes[date] += amount
+        if not day:
+            #cut the 2024-02 part of the day
+            date = date[:7]
+            
+        row_index, exists = string_exists_in_matrix(date_matrix, date)
 
-    # Ensure all dates have both cost and income initialized to 0
-    all_dates = set(costs.keys()).union(set(incomes.keys()))
-    for date in all_dates:
-        if date not in costs:
-            costs[date] = 0
-        if date not in incomes:
-            incomes[date] = 0
-
-    # Find the days with the maximum income and cost
-    max_income_day = max(incomes, key=incomes.get)
-    max_cost_day = max(costs, key=costs.get)
-
-    # Find the days with the minimum income and cost
-    min_income_day = min(incomes, key=incomes.get)
-    min_cost_day = min(costs, key=costs.get)
-
-    print(f"The most income day is: {max_income_day}")
-    print(f"The most cost day is: {max_cost_day}\n")
-
-    print(f"The least income day: {min_income_day}")
-    print(f"The least cost day: {min_cost_day}\n")
-
-
-def find_least_and_most_income_and_cost_months(transactions):
-    month_totals = {}
-
-    for transaction in transactions:
-        amount = int(transaction['amount'])
-        date_str = transaction['date']
-        date = datetime.datetime.strptime(date_str, '%Y-%m-%d')
-        month_key = date.strftime('%Y-%m')
-
-        if month_key not in month_totals:
-            month_totals[month_key] = {'income': 0, 'cost': 0}
-
-        if transaction['type'] == 'income':
-            month_totals[month_key]['income'] += amount
-        elif transaction['type'] == 'cost':
-            month_totals[month_key]['cost'] += amount
-
-    least_income_month = None
-    least_income_amount = float('inf')
-    least_cost_month = None
-    least_cost_amount = float('inf')
-    most_income_month = None
-    most_income_amount = -float('inf')
-    most_cost_month = None
-    most_cost_amount = -float('inf')
-
-    for month_key, totals in month_totals.items():
-        income = totals['income']
-        cost = totals['cost']
-
-        # Find least income month
-        if income < least_income_amount:
-            least_income_amount = income
-            least_income_month = month_key
-
-        # Find least cost month
-        if cost < least_cost_amount:
-            least_cost_amount = cost
-            least_cost_month = month_key
-
-        # Find most income month
-        if income > most_income_amount:
-            most_income_amount = income
-            most_income_month = month_key
-
-        # Find most cost month
-        if cost > most_cost_amount:
-            most_cost_amount = cost
-            most_cost_month = month_key
-
-    print(f"The least income month is: {least_income_month}")
-    print(f"The least cost month is: {least_cost_month}\n")
-
-    print(f"The most income month is: {most_income_month}")
-    print(f"The most cost month is: {most_cost_month}\n")
-
+        #sum the costs and incomes if the date existed before
+        if exists:
+            if transaction["type"] == "Cost":
+                date_matrix[row_index][1] += int(transaction["amount"])
+            else:
+                date_matrix[row_index][2] += int(transaction["amount"])
+            
+        else:
+            if transaction["type"] == "Cost":
+                date_matrix.append([date, int(transaction["amount"]), 0])
+            else:
+                date_matrix.append([date, 0, int(transaction["amount"])])
     
+    #return non if the column of costs or incomes are completely 0 which means there is no transactions in costs or incomes
+    #return the index of the max and min values of the cost and incomes and then find it in matrix and print the date of it
+
+    cost_indices = find_min_and_max(1, date_matrix)
+
+    print(f"[ {string.upper()} ]")
+    if cost_indices == None:
+        print("There is no transaction in cost section\n")
+    else:
+        most_cost_dates = [date_matrix[index + 1][0] for index in cost_indices[0]]
+        print(f"The most cost {string} is:", ", ".join(most_cost_dates))
+
+        min_cost_dates = [date_matrix[index + 1][0] for index in cost_indices[1]]
+        print(f"The min cost {string} is:", ", ".join(min_cost_dates) + "\n")
+
+
+    income_indices = find_min_and_max(2, date_matrix)
+
+    print(f"[ {string.upper()} ]")
+    if income_indices == None:
+        print("There is no transaction in income section\n")
+    else:
+        most_income_dates = [date_matrix[index + 1][0] for index in income_indices[0]]
+        print(f"The most income {string} is:", ", ".join(most_income_dates))
+
+        min_income_dates = [date_matrix[index + 1][0] for index in income_indices[1]]
+        print(f"The min income {string} is:", ", ".join(min_income_dates) + "\n")
+
+
+def string_exists_in_matrix(matrix, target_string):
+    for index, row in enumerate(matrix):
+        if target_string in row:
+            return index, True
+    return -1, False
+
+
+def find_min_and_max(column_index, matrix):
+    column = [row[column_index] for row in matrix[1:]]  # Exclude header row
+
+    if all_elements_are_zero(column):
+        return None
+    else:
+        max_element = max(column)
+        min_element = min(column)
+
+        max_indices = [i for i, x in enumerate(column) if x == max_element]
+        min_indices = [i for i, x in enumerate(column) if x == min_element]
+
+        return max_indices, min_indices
+
+
+def all_elements_are_zero(array):
+    for element in array:
+        if element != 0:
+            return False
+    return True 
+
+
 #return the totall amount of each transactions and all users money as touple 
 def total_user_transactions():
     Incomes = 0
@@ -567,13 +574,13 @@ def valid_money_input(prompt="Enter the amount of money: "):
 
 
 #check the date format for transactions
-def get_user_date(prompt="Enter a date of transport (YYYY-MM-DD): "):
+def get_user_date(prompt="Enter a date (YYYY-MM-DD): "):
     while True:
         user_input = input(prompt)
         try:
-            # Try to parse the input into a datetime object
-            user_date = datetime.strptime(user_input, "%Y-%m-%d")
-            # Format the datetime object to return only the date as string (YYYY-MM-DD)
+            # Use datetime.datetime.strptime to parse the input into a datetime object
+            user_date = datetime.datetime.strptime(user_input, "%Y-%m-%d")
+            # Return the formatted date as a string
             formatted_date = user_date.strftime("%Y-%m-%d")
             return formatted_date
         except ValueError:
