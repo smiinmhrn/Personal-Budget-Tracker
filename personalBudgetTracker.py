@@ -6,13 +6,13 @@
 
 
 
-
 from enum import Enum
 import os
 import json
 import re
 import keyboard
 import datetime
+import time
 
 class FirstMenu(Enum):
     SIGN_UP = ("1. Sign Up", 1)
@@ -176,7 +176,7 @@ def mange_categories():
     
     if user_activity == 1:
        add_new_category()
-       back_perivious()
+       back_perivious("New category added successfully.")
     elif user_activity == 2:
         remove_category()
     elif user_activity == 3:
@@ -206,12 +206,13 @@ def remove_category():
 
     while True:
         if deleted_category in global_user_info["categories"]:
-            print("If you delete this, all of your transactions in this category will be deleted. Are you sure?")
-            print("Press Enter to confirm or Escape to cancel.")
-    
+            print("ATTENTION -> If you delete this, all of your transactions in this category will be deleted.")
+            confirm = input("Are you sure? Y/N\n").lower()
+
             while True:
-                if keyboard.is_pressed('enter'):
-                    print("You pressed Enter. The action will proceed.")
+                if confirm == "y":
+                    print("The action will proceed.")
+                    time.sleep(1)
 
                     filtered_transactions = [transaction for transaction in global_user_info["transactions"] 
                                              if transaction['category'] != deleted_category]
@@ -221,8 +222,9 @@ def remove_category():
     
                     print("delete succsefully")
                     break
-                elif keyboard.is_pressed('esc'):
-                    print("You pressed Escape. The action is cancelled.")
+                elif confirm == "n":
+                    print("The action is cancelled.")
+                    time.sleep(1)
                     break
             
             delete_from_json()
@@ -231,7 +233,8 @@ def remove_category():
         else:
             deleted_category = valid_string_input(input("This name of the category does not exitsted. try again").lower())
 
-    back_perivious()
+    time.sleep(0.5)
+    back_perivious("")
 
 
 #let user to edit name of the category
@@ -261,12 +264,12 @@ def edit_category():
         else:
             edit_category = valid_string_input(input("This category does not existed. try again: ").lower())
     
-    back_perivious()
+    back_perivious("Category edited succesfully.")
 
 
 #access the user to show and do other actions or back to previous menue for manage categories
-def back_perivious():
-    command = valid_number_input(input("The new category is added sucssecfully.\n1. Do other actions          2. Back to perivious menu\n"))
+def back_perivious(input_string):
+    command = valid_number_input(input(input_string + "\n1. Do other actions          2. Back to perivious menu\n"))
 
     while True:
         if command != 1 and command != 2:
