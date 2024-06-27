@@ -1,7 +1,3 @@
-#BUGS TO FIX RIMINDER
-
-
-
 from enum import Enum
 import os
 import json
@@ -98,6 +94,7 @@ def Transaction_registration():
 
     amount = valid_money_input()
     cancel_process = False
+
     while True:
         if transaction_type == "Cost" and amount > global_user_info["cash"]:
             user_choice = valid_number_input(input("you dont have enough money to do this transaction.\n0. cancel transaction          1. fill the account\n"))
@@ -452,6 +449,12 @@ def reportes():
         #print the most and least money that existed in account
         print(f'The maximum of the account cash is {global_user_info["maxCash"]}')
         print(f'The minimum of the account cash is {global_user_info["minCash"]}\n')
+        
+        print("================================================\n")
+
+        find_max_person("Income", "receipt")
+        find_max_person("Cost", "deposit")
+        print()
 
     #access the user back to previous menue
     command = valid_number_input(input("1. Back\n"))
@@ -501,8 +504,7 @@ def find_min_max_month_day_cost_and_income(day, string):
             if transaction["type"] == "Cost":
                 date_matrix[row_index][1] += int(transaction["amount"])
             else:
-                date_matrix[row_index][2] += int(transaction["amount"])
-            
+                date_matrix[row_index][2] += int(transaction["amount"])    
         else:
             if transaction["type"] == "Cost":
                 date_matrix.append([date, int(transaction["amount"]), 0])
@@ -558,6 +560,35 @@ def find_min_and_max(column_index, matrix):
         min_indices = [i for i, x in enumerate(column) if x == min_element]
 
         return max_indices, min_indices
+
+
+def find_max_person(transaction_type, string):
+    data_matrix = [["name", "amount"]]
+
+    for transaction in global_user_info["transactions"]:
+        if transaction["type"] == transaction_type:
+            if transaction_type == "Cost":
+
+                row_index, exists = string_exists_in_matrix(data_matrix, transaction["reciver"])
+                if exists:
+                    data_matrix[row_index][1] += int(transaction["amount"])
+                else:
+                    data_matrix.append([transaction["reciver"], transaction["amount"]])
+            else:
+                row_index, exists = string_exists_in_matrix(data_matrix, transaction["depositor"])
+                if exists:
+                    data_matrix[row_index][1] += int(transaction["amount"])
+                else:
+                    data_matrix.append([transaction["depositor"], transaction["amount"]])
+
+    column = [row[1] for row in data_matrix[1:]]  # Exclude header row
+
+    max_element = max(column)
+
+    max_indices = [i for i, x in enumerate(column) if x == max_element]
+
+    most_person = [data_matrix[index + 1][0] for index in max_indices]
+    print(f"The most {string} is from :", ", ".join(most_person))
 
 
 def all_elements_are_zero(array):
