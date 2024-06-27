@@ -1,9 +1,6 @@
 #BUGS TO FIX RIMINDER
 
 
-# IF THE AMOUNT OF USER CASH IS NOT ENOUGH FOR COST THEN WHAT ?
-
-
 
 from enum import Enum
 import os
@@ -107,6 +104,10 @@ def Transaction_registration():
                 elif user_choice == 1:          
                     fill_the_account()
                     print("account fill succesfully")
+
+                    find_min_max_cash()
+                    delete_from_json()
+                    append_to_file(global_user_info)
                     break
                 else:
                     user_choice = valid_number_input(input("choose from optiones above: "))
@@ -172,11 +173,7 @@ def Transaction_registration():
 def fill_the_account():
     cash = valid_money_input()
     global_user_info["cash"] = global_user_info["cash"] + cash
-    find_min_max_cash()
-    
-    delete_from_json()
 
-    append_to_file(global_user_info)
 
 
 #for set the maxcash and mincash
@@ -271,7 +268,8 @@ def remove_category():
                         print("The action is cancelled.")
                         time.sleep(1)
                         break
-                
+                    else:
+                        confirm = input("choose Y/N\n").lower()
                 delete_from_json()
                 append_to_file(global_user_info)
                 break
@@ -698,6 +696,24 @@ def sign_up():
     append_to_file(global_user_info)
     
     os.system('cls')
+    user_choice = input("Do you want to fill your account at first place? Y/N\n")
+    while True:
+        if user_choice == "y":
+            fill_the_account()
+            global_user_info["maxCash"] = global_user_info["cash"]
+            global_user_info["minCash"] = global_user_info["cash"]
+
+            delete_from_json()
+            append_to_file(global_user_info)
+
+            os.system('cls')
+            break
+        elif user_choice == "n":
+            os.system('cls')
+            break
+        else:
+            user_choice = input("choose Y/N\n").lower()
+
     user_menu()
 
 
