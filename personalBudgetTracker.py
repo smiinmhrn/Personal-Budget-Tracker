@@ -79,19 +79,23 @@ def Transaction_registration():
     print("[ TRANSACTION REGISTRATION ]")
     transaction_type = valid_number_input(input("What kind of transaction is it ؟\n1. Income          2. Cost \n"))
     
+    receiver = ""
+    depositor = ""
+
     while True:
         if transaction_type != 1 and transaction_type != 2:
             transaction_type = valid_number_input(input("choose from options above \n"))
         else: 
             if transaction_type == 1:
                 transaction_type = "Income"
+                receiver = "you"
+                depositor = valid_string_input(input("enter the name of depositor: "))
             else:
                 transaction_type = "Cost"
+                depositor = "you"
+                receiver = valid_string_input(input("enter the name of receiver: "))
             break
 
-    #give the info of transaction from user 
-    receiver = valid_string_input(input("enter the name of receiver: "))
-    depositor = valid_string_input(input("enter the name of depositor: "))
     amount = valid_money_input()
     cancel_process = False
     while True:
