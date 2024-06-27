@@ -96,45 +96,63 @@ def Transaction_registration():
     receiver = valid_string_input(input("enter the name of receiver: "))
     depositor = valid_string_input(input("enter the name of depositor: "))
     amount = valid_money_input()
-    date = str(get_user_date())
-    category = get_category_input()
-
-    #make a dictionary of it to save
-    transactions = {
-        "type": transaction_type,
-        "reciver": receiver,
-        "depositor": depositor,
-        "amount": amount,
-        "date": date,
-        "category": category,
-    }
-
-
-    #check if the transaction is income increase the user cash else decrease it and update the user cash
-    if transaction_type == "Income" :
-        global_user_info["cash"] = global_user_info["cash"] + amount
+    cancel_process = False
+    while True:
+        if transaction_type == "Cost" and amount > global_user_info["cash"]:
+            user_choice = valid_number_input(input("you dont have enough money to do this transaction.\n0. cancel transaction          1. fill the account\n"))
+            while True:
+                if user_choice == 0:
+                    cancel_process = True
+                    break
+                elif user_choice == 1:          
+                    fill_the_account()
+                    print("account fill succesfully")
+                    break
+                else:
+                    user_choice = valid_number_input(input("choose from optiones above: "))
+            if user_choice == 0:
+                break
+        else:
+            break
+    
+    massage = ""
+    if cancel_process :
+        print("Transaction canceled")
     else:
-        global_user_info["cash"] = global_user_info["cash"] - amount
-    
-    #for finding the max cash in the account
-    if global_user_info["cash"] > global_user_info["maxCash"]:
-        global_user_info["maxCash"] = global_user_info["cash"]
-    
-    #for finding the min cash in the account
-    if global_user_info["cash"] < global_user_info["minCash"]:
-        global_user_info["minCash"] = global_user_info["cash"]
+        date = str(get_user_date())
+        category = get_category_input()
 
-    #update and add the new transaction into user account
-    global_user_info["transactions"].append(transactions)
+        #make a dictionary of it to save
+        transactions = {
+            "type": transaction_type,
+            "reciver": receiver,
+            "depositor": depositor,
+            "amount": amount,
+            "date": date,
+            "category": category,
+        }
 
-    #delete the old user info from json file
-    delete_from_json()
 
-    #update an add the user info into file
-    append_to_file(global_user_info)
+        #check if the transaction is income increase the user cash else decrease it and update the user cash
+        if transaction_type == "Income" :
+            global_user_info["cash"] = global_user_info["cash"] + amount
+        else:
+            global_user_info["cash"] = global_user_info["cash"] - amount
+        
+        find_min_max_cash()
+
+        #update and add the new transaction into user account
+        global_user_info["transactions"].append(transactions)
+
+        #delete the old user info from json file
+        delete_from_json()
+
+        #update an add the user info into file
+        append_to_file(global_user_info)
+        massage = "Transaction saved sucsesfully.\n"
     
     #access the user to add another transaction or back to previous menue
-    command = valid_number_input(input("Transaction saved sucsesfully.\n1. Add another          2. Back\n"))
+    command = valid_number_input(input(massage + "1. Add another          2. Back\n"))
 
     while True:
         if command != 1 and command != 2:
@@ -148,6 +166,28 @@ def Transaction_registration():
     else:
         os.system('cls')
         user_menu()
+
+
+#function to fill the account with cash
+def fill_the_account():
+    cash = valid_money_input()
+    global_user_info["cash"] = global_user_info["cash"] + cash
+    find_min_max_cash()
+    
+    delete_from_json()
+
+    append_to_file(global_user_info)
+
+
+#for set the maxcash and mincash
+def find_min_max_cash():
+    #for finding the max cash in the account
+    if global_user_info["cash"] > global_user_info["maxCash"]:
+        global_user_info["maxCash"] = global_user_info["cash"]
+    
+    #for finding the min cash in the account
+    if global_user_info["cash"] < global_user_info["minCash"]:
+        global_user_info["minCash"] = global_user_info["cash"]
 
 
 #use to print the category list
