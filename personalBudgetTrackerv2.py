@@ -1,3 +1,7 @@
+# THIS CODE SHOW THE BILL RESULT IN TABULE USING TABULATE
+
+
+
 from enum import Enum
 import os
 import json
