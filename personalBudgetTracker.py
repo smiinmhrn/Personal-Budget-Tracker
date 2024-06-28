@@ -24,7 +24,7 @@ def main_menu():
     print(FirstMenu.SIGN_UP.value[0], FirstMenu.SIGN_IN.value[0], FirstMenu.EXIST.value[0], sep='\n')
 
     #get the command
-    choice = valid_number_input(input("choose your command... \n"))
+    choice = valid_number_input(input("Choose your command... \n"))
 
     #match the options with user choice
     while True:
@@ -44,7 +44,7 @@ def user_menu():
     print(UserMenu.TRANSACTION_REGISTRATION.value[0], UserMenu.MANAGE_CATEGORIES.value[0],
            UserMenu.BILL.value[0], UserMenu.STATISTICS_AND_REPORTING.value[0], UserMenu.BACK.value[0], sep='\n')
     
-    choice = valid_number_input(input("choose your command...\n"))
+    choice = valid_number_input(input("Choose your command...\n"))
 
     while True:
             if choice == UserMenu.TRANSACTION_REGISTRATION.value[1]:
@@ -72,24 +72,24 @@ def Transaction_registration():
     global global_user_info
 
     os.system('cls')
-    print("[ TRANSACTION REGISTRATION ]")
-    transaction_type = valid_number_input(input("What kind of transaction is it ؟\n1. Income          2. Cost \n"))
+    print("[ TRANSACTION REGISTRATION ]\n")
+    transaction_type = valid_number_input(input("What kind of transaction is it ?\n1. Income          2. Cost \n"))
     
     receiver = ""
     depositor = ""
 
     while True:
         if transaction_type != 1 and transaction_type != 2:
-            transaction_type = valid_number_input(input("choose from options above \n"))
+            transaction_type = valid_number_input(input("Choose from options above \n"))
         else: 
             if transaction_type == 1:
                 transaction_type = "Income"
                 receiver = "you"
-                depositor = valid_string_input(input("enter the name of depositor: "))
+                depositor = valid_string_input(input("Enter the name of depositor: "))
             else:
                 transaction_type = "Cost"
                 depositor = "you"
-                receiver = valid_string_input(input("enter the name of receiver: "))
+                receiver = valid_string_input(input("Enter the name of receiver: "))
             break
 
     amount = valid_money_input()
@@ -97,21 +97,25 @@ def Transaction_registration():
 
     while True:
         if transaction_type == "Cost" and amount > global_user_info["cash"]:
-            user_choice = valid_number_input(input("you dont have enough money to do this transaction.\n0. cancel transaction          1. fill the account\n"))
+
+            print("================================================\n")
+
+            user_choice = valid_number_input(input("You dont have enough money to do this transaction.\n0. Cancel transaction          1. Charge the account\n"))
             while True:
                 if user_choice == 0:
                     cancel_process = True
                     break
                 elif user_choice == 1:          
-                    fill_the_account()
-                    print("account fill succesfully")
+                    charge_the_account()
+                    print("account Charge successfully".upper() + "\n")
+                    print("================================================ Continue\n")
 
                     find_min_max_cash()
                     delete_from_json()
                     append_to_file(global_user_info)
                     break
                 else:
-                    user_choice = valid_number_input(input("choose from optiones above: "))
+                    user_choice = valid_number_input(input("Choose from optiones above: "))
             if user_choice == 0:
                 break
         else:
@@ -119,7 +123,7 @@ def Transaction_registration():
     
     massage = ""
     if cancel_process :
-        print("Transaction canceled")
+        print("Transaction canceled".upper())
     else:
         date = str(get_user_date())
         category = get_category_input()
@@ -151,14 +155,14 @@ def Transaction_registration():
 
         #update an add the user info into file
         append_to_file(global_user_info)
-        massage = "Transaction saved sucsesfully.\n"
+        massage = "Transaction saved successfully.\n"
     
     #access the user to add another transaction or back to previous menue
     command = valid_number_input(input(massage + "1. Add another          2. Back\n"))
 
     while True:
         if command != 1 and command != 2:
-            command = valid_number_input(input("choose from options above \n"))
+            command = valid_number_input(input("Choose from options above \n"))
         else: 
             break
     
@@ -171,10 +175,9 @@ def Transaction_registration():
 
 
 #function to fill the account with cash
-def fill_the_account():
+def charge_the_account():
     cash = valid_money_input()
     global_user_info["cash"] = global_user_info["cash"] + cash
-
 
 
 #for set the maxcash and mincash
@@ -191,7 +194,7 @@ def find_min_max_cash():
 #use to print the category list
 def print_categories():
     if len(global_user_info["categories"]) == 0:
-        print("There is no categories existed")
+        print("There is no categories existed".upper() + "\n")
     else:
         for index, category in enumerate(global_user_info["categories"], start=1):
             print(f"{index}. {category}")
@@ -201,17 +204,17 @@ def print_categories():
 #do the mange categories option in user menu
 def mange_categories():
     os.system("cls")
-    print("[ ACCESSIBLE CATEGORIES ]")
+    print("[ ACCESSIBLE CATEGORIES ]\n")
     print("The category list is as follows: \n")
     print_categories()
 
-    user_activity = valid_number_input(input("1.Add          2.Delete          3.Edit          4.Back \nchoose your action: "))
+    user_activity = valid_number_input(input("1.Add          2.Delete          3.Edit          4.Back \nChoose your action: "))
 
     while True:
         if user_activity >= 1 and user_activity <= 4:
             break
         else:
-            user_activity = valid_number_input(input("choose from options above \n"))
+            user_activity = valid_number_input(input("Choose from options above \n"))
     
     if user_activity == 1:
        add_new_category()
@@ -263,28 +266,27 @@ def remove_category():
                         global_user_info["transactions"] = filtered_transactions
                         global_user_info["categories"].remove(deleted_category)
         
-                        print("delete succsefully")
+                        print("Delete successfully")
                         break
                     elif confirm == "n":
                         print("The action is cancelled.")
                         time.sleep(1)
                         break
                     else:
-                        confirm = input("choose Y/N\n").lower()
+                        confirm = input("Choose Y/N\n").lower()
                 delete_from_json()
                 append_to_file(global_user_info)
                 break
             else:
-                deleted_category = valid_string_input(input("This name of the category does not exitsted. try again").lower())
+                deleted_category = valid_string_input(input("This name of the category does not exitsted. try again: ").lower())
 
-    time.sleep(0.5)
     back_perivious("")
 
 
 #let user to edit name of the category
 def edit_category():
     if len(global_user_info["categories"]) == 0:
-        print("There is no categories existed to edit\n")
+        print("There is no categories existed to edit")
         back_perivious("")
     else:
         edit_category = valid_string_input(input("Enter the name of the category to edit: ").lower())
@@ -312,16 +314,16 @@ def edit_category():
             else:
                 edit_category = valid_string_input(input("This category does not existed. try again: ").lower())
         
-        back_perivious("Category edited succesfully.")
+        back_perivious("Category edited successfully.")
 
 
 #access the user to show and do other actions or back to previous menue for manage categories
 def back_perivious(input_string):
-    command = valid_number_input(input(input_string + "\n1. Do other actions          2. Back to perivious menu\n"))
+    command = valid_number_input(input(input_string + "\n1. Do other actions          2. Back\n"))
 
     while True:
         if command != 1 and command != 2:
-            command = valid_number_input(input("choose from options above \n"))
+            command = valid_number_input(input("Choose from options above \n"))
         else: 
             break
     
@@ -339,13 +341,13 @@ def get_category_input():
 
     print_categories()
 
-    user_category = valid_number_input(input("choose from above if any existed     or     0. add more \n"))
+    user_category = valid_number_input(input("Choose from above if any existed     or     0. add more \n"))
 
     while True:
         if user_category >= 0 and user_category <= len(global_user_info["categories"]):
             break
         else:
-            user_category = valid_number_input(input("choose from options above \n"))
+            user_category = valid_number_input(input("Choose from options above \n"))
     
     if user_category == 0:
         add_new_category()
@@ -357,7 +359,7 @@ def get_category_input():
 def show_bill():
 
     os.system('cls')
-    print("[ SHOW BILL ]")
+    print("[ SHOW BILL ]\n")
 
     if not trasaction_existed():
         print("THER IS NO TRANSACTION EXISTED\n")
@@ -365,11 +367,11 @@ def show_bill():
         result = []
 
         #show the transactions base on user expectation
-        choice_the_type = valid_number_input(input("which bills you want to see?\n1. Incomes          2. Costs          3. all\n"))
+        choice_the_type = valid_number_input(input("Which bills you want to see?\n1. Incomes          2. Costs          3. all\n"))
 
         while True:
             if choice_the_type != 1 and choice_the_type != 2 and choice_the_type != 3:
-                choice_the_type = valid_number_input(input("choose from options above \n"))
+                choice_the_type = valid_number_input(input("Choose from options above \n"))
             else:
                 if choice_the_type == 1:
                     choice_the_type = "Income"
@@ -383,11 +385,11 @@ def show_bill():
                 break
 
         
-        choice_to_prnit = valid_number_input(input("how many bill you want to see?\n1. 10          2. 50          3. all\n"))
+        choice_to_prnit = valid_number_input(input("How many bill you want to see?\n1. 10          2. 50          3. all\n"))
 
         while True:
             if choice_to_prnit != 1 and choice_to_prnit != 2 and choice_to_prnit != 3:
-                choice_to_prnit = valid_number_input(input("choose from options above \n"))
+                choice_to_prnit = valid_number_input(input("Choose from options above \n"))
             else:
                 if choice_to_prnit == 1:
                     result = number_of_bill(10, result)
@@ -396,11 +398,11 @@ def show_bill():
                 break
         
         
-        choice_to_sort = valid_number_input(input("How do you want to sort by the amount?\n1. ascending          2. Descending          3. Dont\n"))
+        choice_to_sort = valid_number_input(input("How do you want to sort by the amount?\n1. Ascending          2. Descending          3. Dont\n"))
 
         while True:
             if choice_to_sort != 1 and choice_to_sort != 2 and choice_to_sort != 3:
-                choice_to_sort = valid_number_input(input("choose from options above \n"))
+                choice_to_sort = valid_number_input(input("Choose from options above \n"))
             else:
                 if choice_to_sort == 1:
                     result = sorted(result, key=lambda x: x['amount']) 
@@ -421,7 +423,7 @@ def show_bill():
 
     while True:
         if command != 1 and command != 2:
-            command = valid_number_input(input("choose from options above \n"))
+            command = valid_number_input(input("Choose from options above \n"))
         else: 
             break
     
@@ -461,7 +463,7 @@ def reportes():
 
     while True:
         if command != 1:
-            command = valid_number_input(input("choose from option above \n"))
+            command = valid_number_input(input("Choose from option above \n"))
         else: 
             break
     
@@ -518,7 +520,7 @@ def find_min_max_month_day_cost_and_income(day, string):
 
     print(f"[ {string.upper()} ]")
     if cost_indices == None:
-        print("There is no transaction in cost section\n")
+        print("There is no transaction in cost \n")
     else:
         most_cost_dates = [date_matrix[index + 1][0] for index in cost_indices[0]]
         print(f"The most cost {string} is:", ", ".join(most_cost_dates))
@@ -531,7 +533,7 @@ def find_min_max_month_day_cost_and_income(day, string):
 
     print(f"[ {string.upper()} ]")
     if income_indices == None:
-        print("There is no transaction in income section\n")
+        print("There is no transaction in income \n")
     else:
         most_income_dates = [date_matrix[index + 1][0] for index in income_indices[0]]
         print(f"The most income {string} is:", ", ".join(most_income_dates))
@@ -582,13 +584,16 @@ def find_max_person(transaction_type, string):
                     data_matrix.append([transaction["depositor"], transaction["amount"]])
 
     column = [row[1] for row in data_matrix[1:]]  # Exclude header row
+    
+    if len(column) == 0:
+        print(f"There is no {string} transaction")
+    else:
+        max_element = max(column)
 
-    max_element = max(column)
+        max_indices = [i for i, x in enumerate(column) if x == max_element]
 
-    max_indices = [i for i, x in enumerate(column) if x == max_element]
-
-    most_person = [data_matrix[index + 1][0] for index in max_indices]
-    print(f"The most {string} is from :", ", ".join(most_person))
+        most_person = [data_matrix[index + 1][0] for index in max_indices]
+        print(f"The most {string} is from :", ", ".join(most_person))
 
 
 def all_elements_are_zero(array):
@@ -705,13 +710,13 @@ def sign_up():
     global global_user_info
 
     os.system('cls')
-    print("[ SIGN UP ]")
+    print("[ SIGN UP ]\n")
     name = input('Enter your full name \n').strip()
-    username = input('Enter user name to creat an account \n').strip()
+    username = input('Enter a user name to creat an account \n').strip()
 
     while True:
         if not uniq_username(username):
-            print('user name already taken choose another one')
+            print('User name already taken choose another one')
             username = input().strip()
         else:
             break
@@ -725,16 +730,16 @@ def sign_up():
         "cash": 0,
         "maxCash": 0,
         "minCash": 0,
-        "categories": ["food", "wearing", "trasports"],
+        "categories": ["food", "wearing", "transports"],
         "transactions" : []
     }
     append_to_file(global_user_info)
     
     os.system('cls')
-    user_choice = input("Do you want to fill your account at first place? Y/N\n")
+    user_choice = input("Do you want to charge your account at first place? Y/N\n")
     while True:
         if user_choice == "y":
-            fill_the_account()
+            charge_the_account()
             global_user_info["maxCash"] = global_user_info["cash"]
             global_user_info["minCash"] = global_user_info["cash"]
 
@@ -747,7 +752,7 @@ def sign_up():
             os.system('cls')
             break
         else:
-            user_choice = input("choose Y/N\n").lower()
+            user_choice = input("Choose Y/N\n").lower()
 
     user_menu()
 
@@ -757,12 +762,12 @@ def sign_in():
     global global_user_info
 
     os.system('cls')
-    print("[ SIGN IN ]")
+    print("[ SIGN IN ]\n")
     username = input('Enter your username \n').strip()
 
     while True: 
         if uniq_username(username):
-            username = input("username not found. try again \n").strip()
+            username = input("Username not found. try again \n").strip()
         else:
             break
     
@@ -773,7 +778,7 @@ def sign_in():
             user_menu()
             break
         else:
-            password = input('your pass is wrong. try again \n').strip()
+            password = input('Your password is wrong. try again \n').strip()
 
 
 #check if the user name is uniq or not
@@ -823,7 +828,7 @@ def valid_password(password):
 def valid_password_lenth(password):
 
     if len(password) < 8:
-        print('your password should has at least 8 characters. try again')
+        print('Your password should has at least 8 characters. try again')
         return False
     else:
         return True
@@ -831,7 +836,7 @@ def valid_password_lenth(password):
 def valid_password_upercase(password):
    
     if not re.search(r"[A-Z]", password):
-        print('your password should has at least one uppercase letter. try again')
+        print('Your password should has at least one uppercase letter. try again')
         return False
     else:
         return True
@@ -839,7 +844,7 @@ def valid_password_upercase(password):
 def valid_password_lowercase(password):
     
     if not re.search(r"[a-z]", password):
-        print('your password should has at least one lowercase letter. try again')
+        print('Your password should has at least one lowercase letter. try again')
         return False
     else:
         return True
@@ -847,7 +852,7 @@ def valid_password_lowercase(password):
 def valid_password_digit(password):
 
     if not re.search(r"\d", password):
-        print('your password should has at least one digit. try again')
+        print('Your password should has at least one digit. try again')
         return False
     else:
         return True
@@ -855,7 +860,7 @@ def valid_password_digit(password):
 def valid_password_character(password):
     
     if not re.search(r"[*$#@!]", password): 
-        print('your password should has at least least one special character (*$#@!). try again')
+        print('Your password should has at least least one special character (*$#@!). try again')
         return False
     else:
         return True       
